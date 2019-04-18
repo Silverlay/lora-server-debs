@@ -1,0 +1,106 @@
+project_name: lora-gateway-bridge
+release:
+  github:
+    owner: brocaar
+    name: lora-gateway-bridge
+  disable: true
+  name_template: '{{.Tag}}'
+brew:
+  name: lora-gateway-bridge
+  commit_author:
+    name: goreleaserbot
+    email: goreleaser@carlosbecker.com
+  install: bin.install "lora-gateway-bridge"
+scoop:
+  name: lora-gateway-bridge
+  commit_author:
+    name: goreleaserbot
+    email: goreleaser@carlosbecker.com
+  url_template: https://github.com/brocaar/lora-gateway-bridge/releases/download/{{
+    .Tag }}/{{ .ArtifactName }}
+builds:
+- goos:
+  - windows
+  - darwin
+  - linux
+  goarch:
+  - amd64
+  - "386"
+  - arm
+  - arm64
+  goarm:
+  - "5"
+  - "6"
+  - "7"
+  targets:
+  - windows_amd64
+  - windows_386
+  - darwin_amd64
+  - linux_amd64
+  - linux_386
+  - linux_arm_5
+  - linux_arm_6
+  - linux_arm_7
+  - linux_arm64
+  ignore:
+  - goos: darwin
+    goarch: "386"
+    goarm: ""
+  main: cmd/lora-gateway-bridge/main.go
+  ldflags:
+  - -s -w -X main.version={{.Version}} -X main.commit={{.Commit}} -X main.date={{.Date}}
+  binary: lora-gateway-bridge
+  lang: go
+archive:
+  name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm
+    }}v{{ .Arm }}{{ end }}'
+  format: tar.gz
+  files:
+  - licence*
+  - LICENCE*
+  - license*
+  - LICENSE*
+  - readme*
+  - README*
+  - changelog*
+  - CHANGELOG*
+nfpm:
+  name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm
+    }}v{{ .Arm }}{{ end }}'
+  files:
+    packaging/files/lora-gateway-bridge.init: /usr/lib/lora-gateway-bridge/scripts/lora-gateway-bridge.init
+    packaging/files/lora-gateway-bridge.rotate: /etc/logrotate.d/lora-gateway-bridge
+    packaging/files/lora-gateway-bridge.service: /usr/lib/lora-gateway-bridge/scripts/lora-gateway-bridge.service
+  scripts:
+    postinstall: packaging/scripts/post-install.sh
+    postremove: packaging/scripts/post-remove.sh
+  formats:
+  - deb
+  vendor: LoRa Server project
+  homepage: https://www.loraserver.io/
+  maintainer: Orne Brocaar <info@brocaar.com>
+  description: LoRa Gateway Bridge
+  license: MIT
+  bindir: /usr/bin
+snapcraft:
+  name_template: '{{ .ProjectName }}_{{ .Version }}_{{ .Os }}_{{ .Arch }}{{ if .Arm
+    }}v{{ .Arm }}{{ end }}'
+snapshot:
+  name_template: SNAPSHOT-{{ .ShortCommit }}
+checksum:
+  name_template: '{{ .ProjectName }}_{{ .Version }}_checksums.txt'
+  algorithm: sha256
+dist: dist
+sign:
+  cmd: gpg
+  args:
+  - --output
+  - $signature
+  - --detach-sig
+  - $artifact
+  signature: ${artifact}.sig
+  artifacts: none
+env_files:
+  github_token: ~/.config/goreleaser/github_token
+github_urls:
+  download: https://github.com
